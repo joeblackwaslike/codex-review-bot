@@ -152,13 +152,23 @@ function registerHandlers(app: App) {
 		const config = getConfig();
 		const commentPayload = payload as IssueCommentWebhookPayload;
 
+		console.log("issue_comment.created received", {
+			association: commentPayload.comment.author_association,
+			isPR: !!commentPayload.issue.pull_request,
+			body: commentPayload.comment.body.slice(0, 100),
+			reviewEnabled: config.reviewEnabled,
+			reviewCommand: config.reviewCommand,
+		});
+
 		if (!commentPayload.issue.pull_request) {
+			console.log("skip: not a PR comment");
 			return;
 		}
 
 		if (
 			!isTrustedAuthorAssociation(commentPayload.comment.author_association)
 		) {
+			console.log("skip: untrusted association", commentPayload.comment.author_association);
 			return;
 		}
 
@@ -167,8 +177,11 @@ function registerHandlers(app: App) {
 			config.reviewCommand,
 		);
 		if (!command) {
+			console.log("skip: command not matched", { body: commentPayload.comment.body, reviewCommand: config.reviewCommand });
 			return;
 		}
+
+		console.log("command matched, proceeding with review", command);
 
 		const installationId = commentPayload.installation?.id;
 		if (!installationId) {

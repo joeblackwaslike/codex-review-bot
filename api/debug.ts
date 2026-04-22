@@ -1,0 +1,14 @@
+import type { VercelRequest, VercelResponse } from "@vercel/node";
+
+export default function handler(_req: VercelRequest, res: VercelResponse) {
+	res.status(200).json({
+		reviewEnabled: process.env.REVIEW_ENABLED,
+		reviewEnabledBool: process.env.REVIEW_ENABLED === "true",
+		reviewCommand: process.env.REVIEW_COMMAND ?? "/codex-review (default)",
+		openAIModel: process.env.OPENAI_MODEL ?? "gpt-5 (default)",
+		hasAppId: !!process.env.GITHUB_APP_ID,
+		hasPrivateKey: !!process.env.GITHUB_APP_PRIVATE_KEY,
+		hasWebhookSecret: !!process.env.GITHUB_WEBHOOK_SECRET,
+		hasOpenAIKey: !!process.env.OPENAI_API_KEY,
+	});
+}

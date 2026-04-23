@@ -59,18 +59,21 @@ describe("buildReviewComments", () => {
 					body: "Anchored correctly",
 					path: "src/file.ts",
 					line: 2,
+					start_line: null,
 				},
 				{
 					title: "Invalid path",
 					body: "Wrong file",
 					path: "src/other.ts",
 					line: 2,
+					start_line: null,
 				},
 				{
 					title: "Invalid line",
 					body: "Not in diff",
 					path: "src/file.ts",
 					line: 99,
+					start_line: null,
 				},
 				{
 					title: "Invalid range",

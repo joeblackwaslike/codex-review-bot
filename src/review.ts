@@ -51,7 +51,7 @@ interface ModelInlineComment {
 	body: string;
 	path: string;
 	line: number;
-	start_line?: number;
+	start_line: number | null;
 }
 
 interface ModelReview {
@@ -152,14 +152,14 @@ export function buildReviewComments(
 		}
 
 		if (
-			comment.start_line !== undefined &&
+			comment.start_line !== null &&
 			comment.start_line >= comment.line
 		) {
 			return [];
 		}
 
 		const startLine =
-			comment.start_line !== undefined ? comment.start_line : undefined;
+			comment.start_line !== null ? comment.start_line : undefined;
 		if (startLine !== undefined && !validLines.has(startLine)) {
 			return [];
 		}
@@ -264,13 +264,13 @@ export async function buildReview(
 							items: {
 								type: "object",
 								additionalProperties: false,
-								required: ["title", "body", "path", "line"],
+								required: ["title", "body", "path", "line", "start_line"],
 								properties: {
 									title: { type: "string" },
 									body: { type: "string" },
 									path: { type: "string" },
 									line: { type: "integer" },
-									start_line: { type: "integer" },
+									start_line: { type: ["integer", "null"] },
 								},
 							},
 						},

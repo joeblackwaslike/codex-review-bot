@@ -168,7 +168,10 @@ function registerHandlers(app: App) {
 		if (
 			!isTrustedAuthorAssociation(commentPayload.comment.author_association)
 		) {
-			console.log("skip: untrusted association", commentPayload.comment.author_association);
+			console.log(
+				"skip: untrusted association",
+				commentPayload.comment.author_association,
+			);
 			return;
 		}
 
@@ -177,7 +180,10 @@ function registerHandlers(app: App) {
 			config.reviewCommand,
 		);
 		if (!command) {
-			console.log("skip: command not matched", { body: commentPayload.comment.body, reviewCommand: config.reviewCommand });
+			console.log("skip: command not matched", {
+				body: commentPayload.comment.body,
+				reviewCommand: config.reviewCommand,
+			});
 			return;
 		}
 

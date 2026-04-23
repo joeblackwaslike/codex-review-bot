@@ -14,8 +14,7 @@ export default defineConfig({
 			"meta",
 			{
 				property: "og:description",
-				content:
-					"AI-powered GitHub code reviews triggered by a slash command.",
+				content: "AI-powered GitHub code reviews triggered by a slash command.",
 			},
 		],
 	],

@@ -1,7 +1,7 @@
 {
-  "database": "dolt",
-  "backend": "dolt",
-  "dolt_mode": "server",
-  "dolt_database": "codex_review_bot",
-  "project_id": "0367cc25-8eb9-4fc6-ab6c-79a4406e2012"
+	"database": "dolt",
+	"backend": "dolt",
+	"dolt_mode": "server",
+	"dolt_database": "codex_review_bot",
+	"project_id": "0367cc25-8eb9-4fc6-ab6c-79a4406e2012"
 }

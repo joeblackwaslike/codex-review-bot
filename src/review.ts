@@ -151,10 +151,7 @@ export function buildReviewComments(
 			return [];
 		}
 
-		if (
-			comment.start_line !== null &&
-			comment.start_line >= comment.line
-		) {
+		if (comment.start_line !== null && comment.start_line >= comment.line) {
 			return [];
 		}
 

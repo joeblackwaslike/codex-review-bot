@@ -1,7 +1,3 @@
-<script setup lang="ts">
-// No script logic needed — pure CSS animation
-</script>
-
 <template>
   <div class="hero-demo-wrapper">
     <div class="demo-window">
@@ -120,8 +116,8 @@
 @keyframes cycle {
   0%   { opacity: 0; transform: translateY(4px); }
   8%   { opacity: 1; transform: translateY(0); }
-  28%  { opacity: 1; transform: translateY(0); }
-  36%  { opacity: 0; transform: translateY(-4px); }
+  36%  { opacity: 1; transform: translateY(0); }
+  44%  { opacity: 0; transform: translateY(-4px); }
   100% { opacity: 0; }
 }
 
@@ -137,7 +133,7 @@
   height: 36px;
   border-radius: 50%;
   background: var(--vp-c-brand-1);
-  color: white;
+  color: var(--vp-c-white);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -251,5 +247,18 @@
   padding: 6px 10px;
   color: var(--vp-c-text-2);
   line-height: 1.5;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .demo-state {
+    animation: none;
+    opacity: 0;
+  }
+  .state-1 {
+    opacity: 1;
+  }
+  .spin {
+    animation: none;
+  }
 }
 </style>

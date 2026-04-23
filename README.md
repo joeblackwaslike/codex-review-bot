@@ -1,118 +1,77 @@
 # codex-review-bot
 
-Minimal GitHub App pull request reviewer scaffold for Vercel.
+[![CI](https://github.com/joeblackwaslike/codex-review-bot/actions/workflows/ci.yml/badge.svg)](https://github.com/joeblackwaslike/codex-review-bot/actions/workflows/ci.yml)
+[![Docs](https://img.shields.io/badge/docs-online-blue)](https://joeblackwaslike.github.io/codex-review-bot/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Node](https://img.shields.io/badge/node-%3E%3D22-brightgreen)](package.json)
+[![Deploy](https://img.shields.io/badge/deploy-vercel-black?logo=vercel)](https://vercel.com/joe-blacks-projects/codex-review-bot)
 
-It is designed to:
+**codex-review-bot** is a GitHub App that posts AI-powered code reviews when you comment `/codex-review` on a pull request. It runs on Vercel, uses OpenAI's GPT-5 via the Responses API, and submits structured reviews with inline comments anchored to the actual diff.
 
-- receive GitHub App webhooks at `/api/github/webhook`
-- authenticate as the app installation
-- react to pull request events
-- submit review comments as `codex-review-bot[bot]`
-- run a custom OpenAI review prompt with a vendored code-review skill
+> **[Full documentation →](https://joeblackwaslike.github.io/codex-review-bot/)**
 
-By default, the app does not auto-review until you set `REVIEW_ENABLED=true`.
+## How it works
 
-You can run it automatically on PR updates, or manually from a PR comment command.
+1. Comment `/codex-review` on any pull request
+2. The bot fetches the diff and PR metadata from GitHub
+3. It builds a prompt from the diff, a vendored code-review skill, and your custom review policy
+4. GPT-5 returns a structured JSON review with a summary, general findings, and inline comments
+5. The bot validates every inline comment anchor against the actual diff, then submits the review
 
-## What This Scaffold Includes
+## Quick start
 
-- Vercel serverless webhook endpoint
-- GitHub App webhook verification
-- Installation-token review submission
-- OpenAI-backed reviewer in [src/review.ts](/Users/joeblack/github/joeblackwaslike/codex-review-bot/src/review.ts:1)
-- Prompt assembly in [src/prompt.ts](/Users/joeblack/github/joeblackwaslike/codex-review-bot/src/prompt.ts:1)
-- Vendored skill guidance in [skills/code-review-excellence/SKILL.md](/Users/joeblack/github/joeblackwaslike/codex-review-bot/skills/code-review-excellence/SKILL.md:1)
-- CI typecheck workflow
+See the **[Quick Start guide](https://joeblackwaslike.github.io/codex-review-bot/quick-start)** for full setup instructions. The short version:
 
-## Local Path
+1. Create a GitHub App with PR read/write + contents read + issues read
+2. Fork this repo and deploy to Vercel
+3. Set the 5 required environment variables
+4. Install the app on your repos
+5. Comment `/codex-review` on a PR
 
-This repo was scaffolded at:
-
-`~/github/joeblackwaslike/codex-review-bot`
-
-## Setup
-
-1. Create a GitHub App.
-2. Give it:
-   - `Pull requests: Read and write`
-   - `Contents: Read-only`
-   - `Metadata: Read-only`
-   - `Issues: Read-only` for PR comment command webhooks
-3. Enable the `Pull request` and `Issue comment` webhook events.
-4. Install the app on the target repos.
-5. Generate a private key for the app.
-6. Add the environment variables shown in `.env.example`.
-7. Deploy to Vercel.
-8. Set the GitHub App webhook URL to:
-
-`https://<your-vercel-domain>/api/github/webhook`
-
-## Environment Variables
-
-- `GITHUB_APP_ID`: numeric GitHub App ID
-- `GITHUB_APP_PRIVATE_KEY`: app private key PEM, with `\n` newlines preserved
-- `GITHUB_WEBHOOK_SECRET`: secret used to verify webhook signatures
-- `REVIEW_ENABLED`: set to `true` to allow review submission
-- `REVIEW_COMMENT_PREFIX`: prefix used in top-level review bodies
-- `REVIEW_COMMAND`: slash command to trigger manual reviews, default `/codex-review`
-- `OPENAI_API_KEY`: OpenAI API key used to run the review
-- `OPENAI_MODEL`: model name for the Responses API, default `gpt-5`
-- `CUSTOM_REVIEW_PROMPT`: your repo-specific review prompt appended after the skill guidance
-
-## Default Review Logic
-
-The reviewer now:
-
-- fetches PR metadata and changed-file patches from GitHub
-- loads the local `code-review-excellence` skill file
-- appends your `CUSTOM_REVIEW_PROMPT`
-- appends command-specific instructions from a PR comment trigger
-- sends the assembled prompt to the OpenAI Responses API
-- expects structured JSON back and converts that into a GitHub review with inline comments when anchors are valid
-
-The bot validates model-provided line anchors against the actual diff and drops any invalid inline comments before submitting the review. The implementation lives in [src/review.ts](/Users/joeblack/github/joeblackwaslike/codex-review-bot/src/review.ts:1).
-
-## Manual Trigger
-
-On a pull request conversation, comment:
+## Commands
 
 ```text
-/codex-review
+/codex-review                              # standard review
+/codex-review focus on security            # with extra instructions
+/codex-review --force                      # re-review same commit
+/codex-review --force check for regressions
 ```
 
-With extra instructions:
+Only `OWNER`, `MEMBER`, and `COLLABORATOR` author associations are accepted.
 
-```text
-/codex-review focus on packaging and release risk
+## Environment variables
+
+| Variable | Required | Default | Description |
+|---|---|---|---|
+| `GITHUB_APP_ID` | ✓ | — | Numeric GitHub App ID |
+| `GITHUB_APP_PRIVATE_KEY` | ✓ | — | RSA private key PEM (use `\n` for newlines) |
+| `GITHUB_WEBHOOK_SECRET` | ✓ | — | HMAC secret for webhook signature verification |
+| `OPENAI_API_KEY` | ✓ | — | OpenAI API key |
+| `REVIEW_ENABLED` | ✓ | `false` | Set to `true` to enable review submission |
+| `OPENAI_MODEL` | — | `gpt-5` | Model passed to the Responses API |
+| `REVIEW_COMMAND` | — | `/codex-review` | Slash command to trigger reviews |
+| `REVIEW_COMMENT_PREFIX` | — | `codex-review-bot` | Heading in review body |
+| `CUSTOM_REVIEW_PROMPT` | — | `Focus on correctness...` | Appended to the prompt |
+
+See [`.env.example`](.env.example) for a ready-to-copy template.
+
+## Development
+
+```bash
+npm install
+npm run dev          # vercel dev (local server)
+npm run typecheck    # tsc --noEmit
+npm run lint         # biome check
+npm run test         # vitest run
+npm run docs:dev     # vitepress docs server
 ```
 
-To force a rerun on the same commit:
+Use [smee.io](https://smee.io) to receive live webhooks locally during development.
 
-```text
-/codex-review --force
-```
+## Contributing
 
-Only `OWNER`, `MEMBER`, and `COLLABORATOR` author associations are accepted by default.
+See [CONTRIBUTING.md](CONTRIBUTING.md).
 
-## Deploy To Vercel
+## License
 
-1. Create a new Vercel project from this repo.
-2. Set the framework preset to `Other`.
-3. Add the env vars from `.env.example`.
-4. Deploy.
-
-After deploy, use the resulting Vercel URL as the GitHub App `Webhook URL`.
-
-## Local Development
-
-If you do not have a public host yet, use `smee.io` temporarily:
-
-1. Create a Smee channel.
-2. Set the GitHub App `Webhook URL` to that Smee URL.
-3. Run the forwarder locally.
-4. Run `vercel dev`.
-
-## Notes
-
-- Reviews posted with installation auth appear as the app bot, not as your personal GitHub user.
-- The OpenAI integration uses the Responses API. See the official docs: [Text generation](https://platform.openai.com/docs/guides/chat-completions), [Responses API reference](https://platform.openai.com/docs/api-reference/responses/retrieve), [Structured outputs](https://platform.openai.com/docs/guides/json-mode)
+MIT — see [LICENSE](LICENSE).

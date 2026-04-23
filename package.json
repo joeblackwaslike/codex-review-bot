@@ -11,7 +11,10 @@
 		"build": "tsc --noEmit",
 		"typecheck": "tsc --noEmit",
 		"lint": "biome check .",
-		"test": "vitest run"
+		"test": "vitest run",
+		"docs:dev": "vitepress dev docs",
+		"docs:build": "vitepress build docs",
+		"docs:preview": "vitepress preview docs"
 	},
 	"dependencies": {
 		"@vercel/node": "^3.2.25",
@@ -22,6 +25,7 @@
 		"@biomejs/biome": "^2.4.12",
 		"@types/node": "^22.15.3",
 		"typescript": "^5.8.3",
+		"vitepress": "^1.6.4",
 		"vitest": "^3.2.4"
 	}
 }

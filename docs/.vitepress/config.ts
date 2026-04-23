@@ -18,14 +18,6 @@ export default defineConfig({
 					"AI-powered GitHub code reviews triggered by a slash command.",
 			},
 		],
-		[
-			"meta",
-			{
-				property: "og:image",
-				content:
-					"https://joeblackwaslike.github.io/codex-review-bot/og-image.png",
-			},
-		],
 	],
 
 	themeConfig: {

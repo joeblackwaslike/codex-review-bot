@@ -1,0 +1,11 @@
+:root {
+	--vp-home-hero-name-color: transparent;
+	--vp-home-hero-name-background: linear-gradient(120deg, #4f86f7, #7c3aed);
+	--vp-home-hero-image-background-image: none;
+}
+
+.hero-demo-wrapper {
+	max-width: 760px;
+	margin: 0 auto 48px;
+	padding: 0 24px;
+}

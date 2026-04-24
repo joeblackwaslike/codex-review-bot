@@ -157,18 +157,25 @@ export function buildReviewComments(
 		}
 
 		if (!validLines.has(comment.line)) {
-			console.log("inline comment dropped: line not in valid right-side lines", {
-				path: comment.path,
-				line: comment.line,
-				validLines: Array.from(validLines).sort((a, b) => a - b),
-			});
+			console.log(
+				"inline comment dropped: line not in valid right-side lines",
+				{
+					path: comment.path,
+					line: comment.line,
+					validLines: Array.from(validLines).sort((a, b) => a - b),
+				},
+			);
 			return [];
 		}
 
 		if (comment.start_line !== null && comment.start_line >= comment.line) {
 			console.log(
 				"inline comment dropped: start_line >= line (backwards range)",
-				{ path: comment.path, line: comment.line, start_line: comment.start_line },
+				{
+					path: comment.path,
+					line: comment.line,
+					start_line: comment.start_line,
+				},
 			);
 			return [];
 		}
@@ -176,11 +183,14 @@ export function buildReviewComments(
 		const startLine =
 			comment.start_line !== null ? comment.start_line : undefined;
 		if (startLine !== undefined && !validLines.has(startLine)) {
-			console.log("inline comment dropped: start_line not in valid right-side lines", {
-				path: comment.path,
-				line: comment.line,
-				start_line: startLine,
-			});
+			console.log(
+				"inline comment dropped: start_line not in valid right-side lines",
+				{
+					path: comment.path,
+					line: comment.line,
+					start_line: startLine,
+				},
+			);
 			return [];
 		}
 
@@ -309,7 +319,9 @@ export async function buildReview(
 		event: modelReview.event,
 		generalFindings: modelReview.general_findings.length,
 		inlineComments: modelReview.inline_comments.length,
-		inlineCommentPaths: modelReview.inline_comments.map((c) => `${c.path}:${c.line}`),
+		inlineCommentPaths: modelReview.inline_comments.map(
+			(c) => `${c.path}:${c.line}`,
+		),
 	});
 
 	const reviewComments = buildReviewComments(

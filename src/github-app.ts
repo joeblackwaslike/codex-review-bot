@@ -51,7 +51,8 @@ type PullRequestDetails = {
 
 let appSingleton: App | null = null;
 
-async function maybeSubmitReview(args: {
+/** @internal Exported for unit testing only. */
+export async function maybeSubmitReview(args: {
 	app: App;
 	installationId: number;
 	owner: string;

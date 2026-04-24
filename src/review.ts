@@ -147,17 +147,40 @@ export function buildReviewComments(
 
 	return inlineComments.flatMap((comment) => {
 		const validLines = validLinesByPath.get(comment.path);
-		if (!validLines?.has(comment.line)) {
+		if (!validLines) {
+			console.log("inline comment dropped: path not in diff", {
+				path: comment.path,
+				line: comment.line,
+				knownPaths: Array.from(validLinesByPath.keys()),
+			});
+			return [];
+		}
+
+		if (!validLines.has(comment.line)) {
+			console.log("inline comment dropped: line not in valid right-side lines", {
+				path: comment.path,
+				line: comment.line,
+				validLines: Array.from(validLines).sort((a, b) => a - b),
+			});
 			return [];
 		}
 
 		if (comment.start_line !== null && comment.start_line >= comment.line) {
+			console.log(
+				"inline comment dropped: start_line >= line (backwards range)",
+				{ path: comment.path, line: comment.line, start_line: comment.start_line },
+			);
 			return [];
 		}
 
 		const startLine =
 			comment.start_line !== null ? comment.start_line : undefined;
 		if (startLine !== undefined && !validLines.has(startLine)) {
+			console.log("inline comment dropped: start_line not in valid right-side lines", {
+				path: comment.path,
+				line: comment.line,
+				start_line: startLine,
+			});
 			return [];
 		}
 
@@ -282,10 +305,22 @@ export async function buildReview(
 		throw new Error("Model did not return valid review JSON");
 	}
 
+	console.log("model review parsed", {
+		event: modelReview.event,
+		generalFindings: modelReview.general_findings.length,
+		inlineComments: modelReview.inline_comments.length,
+		inlineCommentPaths: modelReview.inline_comments.map((c) => `${c.path}:${c.line}`),
+	});
+
 	const reviewComments = buildReviewComments(
 		files,
 		modelReview.inline_comments,
 	).slice(0, 10);
+
+	console.log("inline comments after validation", {
+		submitted: reviewComments.length,
+		dropped: modelReview.inline_comments.length - reviewComments.length,
+	});
 	const findingsBlock = formatFindings(modelReview.general_findings);
 	const inlineSummary =
 		reviewComments.length > 0

@@ -103,18 +103,48 @@ async function maybeSubmitReview(args: {
 		return;
 	}
 
-	await octokit.request(
-		"POST /repos/{owner}/{repo}/pulls/{pull_number}/reviews",
-		{
-			owner,
-			repo,
-			pull_number: pullNumber,
-			commit_id: headSha,
-			event: review.event,
-			body: review.body,
-			comments: review.comments,
-		},
-	);
+	console.log("submitting review", {
+		owner,
+		repo,
+		pullNumber,
+		event: review.event,
+		inlineComments: review.comments.length,
+	});
+
+	try {
+		await octokit.request(
+			"POST /repos/{owner}/{repo}/pulls/{pull_number}/reviews",
+			{
+				owner,
+				repo,
+				pull_number: pullNumber,
+				commit_id: headSha,
+				event: review.event,
+				body: review.body,
+				comments: review.comments,
+			},
+		);
+	} catch (err) {
+		if (review.comments.length === 0) {
+			throw err;
+		}
+		console.error(
+			"review POST with inline comments failed, retrying without comments",
+			err,
+		);
+		await octokit.request(
+			"POST /repos/{owner}/{repo}/pulls/{pull_number}/reviews",
+			{
+				owner,
+				repo,
+				pull_number: pullNumber,
+				commit_id: headSha,
+				event: review.event,
+				body: review.body,
+				comments: [],
+			},
+		);
+	}
 }
 
 function registerHandlers(app: App) {

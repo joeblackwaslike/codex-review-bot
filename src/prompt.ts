@@ -103,7 +103,7 @@ export function buildPrompt(context: PromptContext): string {
 		"- Keep the summary concise.",
 		"- Findings should focus on correctness, security, regressions, and testing gaps.",
 		"- Only use inline comments for lines that appear in the provided diff.",
-		"- Use `start_line` only for multi-line ranges, and only when `start_line` is less than `line`. Otherwise omit it.",
+		"- Use `start_line` for multi-line ranges only, and only when `start_line` is less than `line`. Set `start_line` to `null` for single-line comments.",
 		"- Put unanchored concerns into `general_findings`, not `inline_comments`.",
 	].join("\n");
 }
